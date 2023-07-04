@@ -2403,6 +2403,16 @@ func (c *Compiler) lifeSet(is IniSection, sc *StateControllerBase, _ int8) (Stat
 	})
 	return *ret, err
 }
+func (c *Compiler) lifeMul(is IniSection, sc *StateControllerBase, _ int8) (StateController, error) {
+	ret, err := (*lifeMul)(sc), c.stateSec(is, func() error {
+		if err := c.paramValue(is, sc, "redirectid",
+			lifeMul_redirectid, VT_Int, 1, false); err != nil {
+			return err
+		}
+		return c.paramValue(is, sc, "value", lifeMul_value, VT_Int, 1, true)
+	})
+	return *ret, err
+}
 func (c *Compiler) powerAdd(is IniSection, sc *StateControllerBase, _ int8) (StateController, error) {
 	ret, err := (*powerAdd)(sc), c.stateSec(is, func() error {
 		if err := c.paramValue(is, sc, "redirectid",

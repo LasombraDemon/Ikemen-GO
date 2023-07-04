@@ -166,6 +166,7 @@ func newCompiler() *Compiler {
 		"text":                 c.text,
 		"modifystagevar":       c.modifyStageVar,
 		"camera":               c.cameraCtrl,
+		"lifemul":              c.lifeMul,
 	}
 	return c
 }
@@ -389,6 +390,7 @@ var triggerMap = map[string]int{
 	"timetotal":        1,
 	"winhyper":         1,
 	"winspecial":       1,
+	"pushed":           1,
 }
 
 func (c *Compiler) tokenizer(in *string) string {
@@ -2039,6 +2041,8 @@ func (c *Compiler) expValue(out *BytecodeExp, in *string,
 			return bvNone(), err
 		}
 		out.append(OC_projhittime)
+	case "pushed":
+		out.append(OC_ex_, OC_ex_pushed)
 	case "random":
 		out.append(OC_random)
 

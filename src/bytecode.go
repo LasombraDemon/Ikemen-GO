@@ -526,6 +526,7 @@ const (
 	OC_ex_envshakevar_time
 	OC_ex_envshakevar_freq
 	OC_ex_envshakevar_ampl
+	OC_ex_pushed
 )
 const (
 	NumVar     = 60
@@ -2117,6 +2118,8 @@ func (be BytecodeExp) run_ex(c *Char, i *int, oc *Char) {
 		sys.bcStack.PushF(sys.envShake.freq / float32(math.Pi) * 180)
 	case OC_ex_envshakevar_ampl:
 		sys.bcStack.PushF(float32(math.Abs(float64(sys.envShake.ampl / oc.localscl))))
+	case OC_ex_pushed:
+		sys.bcStack.PushB(c.pushed)
 	default:
 		sys.errLog.Printf("%v\n", be[*i-1])
 		c.panic()
@@ -5427,6 +5430,31 @@ func (sc lifeSet) Run(c *Char, _ []int32) bool {
 		case lifeSet_value:
 			crun.lifeSet(exp[0].evalI(c))
 		case lifeSet_redirectid:
+			if rid := sys.playerID(exp[0].evalI(c)); rid != nil {
+				crun = rid
+			} else {
+				return false
+			}
+		}
+		return true
+	})
+	return false
+}
+
+type lifeMul StateControllerBase
+
+const (
+	lifeMul_value byte = iota
+	lifeMul_redirectid
+)
+
+func (sc lifeMul) Run(c *Char, _ []int32) bool {
+	crun := c
+	StateControllerBase(sc).run(c, func(id byte, exp []BytecodeExp) bool {
+		switch id {
+		case lifeMul_value:
+			crun.lifeSet(crun.life * exp[0].evalI(c))
+		case lifeMul_redirectid:
 			if rid := sys.playerID(exp[0].evalI(c)); rid != nil {
 				crun = rid
 			} else {
